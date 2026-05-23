@@ -1,0 +1,5 @@
+EMAIL_INPUT = "//input[@name='name']"
+BUTTON_RECOVER = "//button[text()='Восстановить']"
+PASSWORD_INPUT = "//input[@name='Введите новый пароль']"
+BUTTON_SHOW_PASSWORD = "//div[contains(@class, 'input__icon')]"
+PASSWORD_FIELD_ACTIVE = "//div[contains(@class, 'input_status_active')]"

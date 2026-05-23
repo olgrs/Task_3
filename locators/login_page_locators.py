@@ -1,0 +1,5 @@
+EMAIL_INPUT = "//input[@name='name']"
+PASSWORD_INPUT = "//input[@name='Пароль']"
+BUTTON_LOGIN = "//button[text()='Войти']"
+BUTTON_REGISTER = "//a[text()='Зарегистрироваться']"
+BUTTON_FORGOT_PASSWORD = "//a[text()='Восстановить пароль']"

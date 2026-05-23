@@ -1,0 +1,6 @@
+ORDER_IN_FEED = "//a[contains(@class, 'OrderHistory_link')]"
+MODAL_ORDER_DETAILS = "//div[contains(@class, 'Modal_modal')]"
+TEXT_ORDER_ID = "//p[contains(@class, 'text_type_digits-default')]"
+COUNTER_ALL_TIME = "//p[text()='Выполнено за всё время:']/following-sibling::p"
+COUNTER_TODAY = "//p[text()='Выполнено за сегодня:']/following-sibling::p"
+ORDER_IN_WORK = "//ul[contains(@class, 'OrderFeed_orderListReady')]//li"
