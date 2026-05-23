@@ -1,3 +1,7 @@
+from selenium.common.exceptions import (
+    TimeoutException,
+    ElementClickInterceptedException
+)
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
@@ -14,12 +18,15 @@ class BasePage:
     def find_element_with_wait(self, locator):
         self.wait.until(EC.visibility_of_element_located(locator))
         return self.driver.find_element(*locator)
+    
+    def find_elements(self, locator):
+        return self.driver.find_elements(*locator)
 
     def click_to_element(self, locator):
         try:
             self.wait.until(EC.element_to_be_clickable(locator))
             self.driver.find_element(*locator).click()
-        except:
+        except (TimeoutException, ElementClickInterceptedException):
             element = self.driver.find_element(*locator)
             self.driver.execute_script("arguments[0].click();", element)
 
@@ -49,31 +56,32 @@ class BasePage:
     def drag_and_drop_element(self, source_locator, target_locator):
         source = self.find_element_with_wait(source_locator)
         target = self.find_element_with_wait(target_locator)
-        script = """
-        function simulateHTML5DragAndDrop(sourceNode, destinationNode) {
-            var dataTransfer = new DataTransfer();
-            var dragStartEvent = new DragEvent('dragstart', {
-                bubbles: true,
-                cancelable: true,
-                dataTransfer: dataTransfer
-            });
-            sourceNode.dispatchEvent(dragStartEvent);
-            var dropEvent = new DragEvent('drop', {
-                bubbles: true,
-                cancelable: true,
-                dataTransfer: dataTransfer
-            });
-            destinationNode.dispatchEvent(dropEvent);
-            var dragEndEvent = new DragEvent('dragend', {
-                bubbles: true,
-                cancelable: true,
-                dataTransfer: dataTransfer
-            });
-            sourceNode.dispatchEvent(dragEndEvent);
-        }
-        simulateHTML5DragAndDrop(arguments[0], arguments[1]);
-        """
-        self.driver.execute_script(script, source, target)
+        self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", source)
+        self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", target)
+        self.driver.execute_script("""
+            function simulateHTML5DragAndDrop(sourceNode, destinationNode) {
+                var dataTransfer = new DataTransfer();
+                var dragStartEvent = new DragEvent('dragstart', {
+                    bubbles: true,
+                    cancelable: true,
+                    dataTransfer: dataTransfer
+                });
+                sourceNode.dispatchEvent(dragStartEvent);
+                var dropEvent = new DragEvent('drop', {
+                    bubbles: true,
+                    cancelable: true,
+                    dataTransfer: dataTransfer
+                });
+                destinationNode.dispatchEvent(dropEvent);
+                var dragEndEvent = new DragEvent('dragend', {
+                    bubbles: true,
+                    cancelable: true,
+                    dataTransfer: dataTransfer
+                });
+                sourceNode.dispatchEvent(dragEndEvent);
+            }
+            simulateHTML5DragAndDrop(arguments[0], arguments[1]);
+        """, source, target)
 
     def wait_for_url_to_be(self, url, timeout=10):
         WebDriverWait(self.driver, timeout).until(EC.url_to_be(url))
@@ -82,10 +90,25 @@ class BasePage:
         WebDriverWait(self.driver, timeout).until(EC.invisibility_of_element_located(locator))
 
     def is_element_displayed(self, locator):
-        return self.find_element_with_wait(locator).is_displayed()
+        try:
+            element = self.driver.find_element(*locator)
+            return element.is_displayed()
+        except (TimeoutException, ElementClickInterceptedException):
+            return False
 
     def wait_for_element_present(self, locator, timeout=10):
         WebDriverWait(self.driver, timeout).until(EC.presence_of_element_located(locator))
 
     def wait_for_text_in_element(self, locator, text, timeout=10):
         WebDriverWait(self.driver, timeout).until(EC.text_to_be_present_in_element(locator, text))
+
+    def wait_for_url_contains(self, partial_url, timeout=10):
+        WebDriverWait(self.driver, timeout).until(EC.url_contains(partial_url))
+
+    def refresh_page(self):
+        self.driver.refresh()
+
+    def wait_for_element_visible(self, locator, timeout=10):
+        WebDriverWait(self.driver, timeout).until(
+            EC.visibility_of_element_located(locator)
+        )

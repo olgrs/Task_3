@@ -25,3 +25,5 @@ MODAL_CLOSE_BUTTON = "//button[contains(@class, 'Modal_modal__close')]"
 ORDER_MODAL = "//div[contains(@class, 'Modal_modal') and contains(., 'идентификатор заказа')]"
 ORDER_NUMBER = "//h2[contains(@class, 'Modal_modal__title')]"
 ORDER_MODAL_CLOSE = "//button[contains(@class, 'Modal_modal__close')]"
+
+ORDER_ID = "//p[text()='идентификатор заказа']"

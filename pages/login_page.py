@@ -1,4 +1,5 @@
 import allure
+from data import BASE_URL
 from pages.base_page import BasePage
 from locators.login_page_locators import *
 
@@ -30,3 +31,4 @@ class LoginPage(BasePage):
         self.enter_email(email)
         self.enter_password(password)
         self.click_login()
+        self.wait_for_url_to_be(BASE_URL)

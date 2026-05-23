@@ -1,7 +1,7 @@
 import allure
 from pages.base_page import BasePage
 from locators.main_page_locators import *
-from data import BASE_URL
+from data import BASE_URL, FEED_URL
 
 
 class MainPage(BasePage):
@@ -17,6 +17,7 @@ class MainPage(BasePage):
     @allure.step("Клик по кнопке 'Лента Заказов'")
     def click_order_feed(self):
         self.click_to_element(("xpath", BUTTON_ORDER_FEED))
+        self.wait_for_url_to_be(FEED_URL)
 
     @allure.step("Клик по кнопке 'Личный Кабинет'")
     def click_personal_account(self):

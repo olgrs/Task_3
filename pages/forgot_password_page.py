@@ -19,4 +19,16 @@ class ForgotPasswordPage(BasePage):
 
     @allure.step("Проверить, что поле пароля активно")
     def is_password_field_active(self):
-        return self.find_element_with_wait(("xpath", PASSWORD_FIELD_ACTIVE)).is_displayed()
+        return self.is_element_displayed(("xpath", PASSWORD_FIELD_ACTIVE))
+
+    @allure.step("Проверить, что отображается страница восстановления пароля")
+    def is_password_recovery_page_displayed(self):
+        return self.is_element_displayed(("xpath", PAGE_TITLE))
+
+    @allure.step("Дождаться появления поля для нового пароля")
+    def wait_for_new_password_input(self):
+        self.find_element_with_wait(("xpath", PASSWORD_INPUT))
+
+    @allure.step("Проверить, что поле ввода нового пароля отображается")
+    def is_new_password_input_displayed(self):
+        return self.is_element_displayed(("xpath", PASSWORD_INPUT))

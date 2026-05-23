@@ -50,6 +50,7 @@ class TestMainFunctionality:
         login_page.login(email, password)
         main_page.add_ingredient_to_constructor(INGREDIENT_BUN, CONSTRUCTOR_AREA)
         main_page.click_place_order()
-        assert main_page.is_element_displayed(("xpath", "//p[text()='идентификатор заказа']")), (
+        main_page.find_element_with_wait(("xpath", ORDER_NUMBER))
+        assert main_page.is_element_displayed(("xpath", ORDER_NUMBER)), (
             "Не удалось оформить заказ"
         )
