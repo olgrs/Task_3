@@ -1,29 +1,25 @@
-# Кнопки в хедере
-BUTTON_CONSTRUCTOR = "//p[text()='Конструктор']"
-BUTTON_ORDER_FEED = "//p[text()='Лента Заказов']"
-BUTTON_PERSONAL_ACCOUNT = "//p[text()='Личный Кабинет']"
+from selenium.webdriver.common.by import By
 
-# Кнопки на главной
-BUTTON_LOGIN_MAIN = "//button[text()='Войти в аккаунт']"
-BUTTON_PLACE_ORDER = "//button[text()='Оформить заказ']"
+BURGER_MAKE_HEADING = (By.XPATH, "//h1[text()='Соберите бургер']")
 
-# Конструктор бургера
-INGREDIENT_BUN = "//p[text()='Краторная булка N-200i']"
-INGREDIENT_SAUCE = "//p[text()='Соус Spicy-X']"
-INGREDIENT_FILLING = "//p[text()='Мясо бессмертных моллюсков Protostomia']"
-CONSTRUCTOR_AREA = "//section[contains(@class, 'BurgerConstructor')]"
+# main buttons
+BUTTON_LOGIN_MAIN = (By.XPATH, "//button[text()='Войти в аккаунт']")
+BUTTON_PLACE_ORDER = (By.XPATH, "//button[text()='Оформить заказ']")
 
-# Счетчики ингредиентов
-COUNTER_BUN = "//p[text()='Краторная булка N-200i']/ancestor::div[contains(@class, 'BurgerIngredient')]//p[contains(@class, 'counter__num')]"
+# ingredients
+INGREDIENT_BUN = (By.XPATH, "//p[text()='Краторная булка N-200i']")
+CONSTRUCTOR_AREA = (By.XPATH, "//section[contains(@class, 'BurgerConstructor')]")
 
-# Модальное окно ингредиента
-MODAL_INGREDIENT_DETAILS = "//div[contains(@class, 'Modal_modal')]"
-MODAL_INGREDIENT_TITLE = "//h2[contains(@class, 'Modal_modal__title')]"
-MODAL_CLOSE_BUTTON = "//button[contains(@class, 'Modal_modal__close')]"
+COUNTER_BUN = (
+    By.XPATH,
+    "//p[text()='Краторная булка N-200i']/ancestor::div[contains(@class, 'BurgerIngredient')]//p[contains(@class, 'counter__num')]"
+)
 
-# Модальное окно подтверждения заказа
-ORDER_MODAL = "//div[contains(@class, 'Modal_modal') and contains(., 'идентификатор заказа')]"
-ORDER_NUMBER = "//h2[contains(@class, 'Modal_modal__title')]"
-ORDER_MODAL_CLOSE = "//button[contains(@class, 'Modal_modal__close')]"
+# modal ingredient
+MODAL_INGREDIENT_DETAILS = (By.XPATH, "//div[contains(@class, 'Modal_modal')]")
+MODAL_CLOSE_BUTTON = (By.XPATH, "//button[contains(@class, 'Modal_modal__close')]")
 
-ORDER_ID = "//p[text()='идентификатор заказа']"
+# order modal
+ORDER_MODAL = (By.XPATH, "//div[contains(@class, 'Modal_modal') and contains(., 'идентификатор заказа')]")
+ORDER_NUMBER = (By.XPATH, "//h2[contains(@class, 'Modal_modal__title')]")
+ORDER_MODAL_CLOSE = (By.XPATH, "//button[contains(@class, 'Modal_modal__close')]")

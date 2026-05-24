@@ -1,9 +1,8 @@
-from selenium.common.exceptions import (
-    TimeoutException,
-    ElementClickInterceptedException
-)
+import allure
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+
+from locators.base_page_locators import *
 
 
 class BasePage:
@@ -12,46 +11,45 @@ class BasePage:
         self.timeout = 10
         self.wait = WebDriverWait(self.driver, self.timeout)
 
+    # ---------------- NAVIGATION ----------------
     def go_to_url(self, url):
         self.driver.get(url)
 
-    def find_element_with_wait(self, locator):
-        self.wait.until(EC.visibility_of_element_located(locator))
-        return self.driver.find_element(*locator)
-    
-    def find_elements(self, locator):
-        return self.driver.find_elements(*locator)
+    # ------------------ HEADER ------------------
+    @allure.step("Клик по кнопке 'Лента Заказов'")
+    def click_order_feed(self):
+        self.click_to_element(BUTTON_ORDER_FEED)
 
+    @allure.step("Клик по кнопке 'Конструктор'")
+    def open_constructor(self):
+        self.click_to_element(BUTTON_CONSTRUCTOR)
+
+    @allure.step("Клик по кнопке 'Личный Кабинет'")
+    def open_profile(self):
+        self.click_to_element(BUTTON_PERSONAL_ACCOUNT)
+
+    # ---------------- ACTIONS ----------------
     def click_to_element(self, locator):
+        element = self.find_element_with_wait(locator)
+
+        self.driver.execute_script(
+            "arguments[0].scrollIntoView({block: 'center'});",
+            element
+        )
+        self.wait.until(EC.element_to_be_clickable(locator))
         try:
-            self.wait.until(EC.element_to_be_clickable(locator))
-            self.driver.find_element(*locator).click()
-        except (TimeoutException, ElementClickInterceptedException):
-            element = self.driver.find_element(*locator)
-            self.driver.execute_script("arguments[0].click();", element)
+            element.click()
+        except Exception:
+            self.driver.execute_script(
+                "arguments[0].click();",
+                element
+            )
 
     def add_text_to_element(self, locator, text):
         self.find_element_with_wait(locator).send_keys(text)
 
     def get_text_from_element(self, locator):
-        return self.find_element_with_wait(locator).text
-
-    def scroll_to_element(self, locator):
-        element = self.find_element_with_wait(locator)
-        self.driver.execute_script("arguments[0].scrollIntoView();", element)
-
-    def get_current_url(self):
-        return self.driver.current_url
-
-    def switch_to_another_window(self):
-        self.driver.switch_to.window(self.driver.window_handles[1])
-
-    def wait_for_url_not_blank(self):
-        WebDriverWait(self.driver, 10).until(lambda d: d.current_url != "about:blank")
-
-    def close_cookie_window(self, locator):
-        self.find_element_with_wait(locator)
-        self.click_to_element(locator)
+        return self.driver.find_element(*locator).text
 
     def drag_and_drop_element(self, source_locator, target_locator):
         source = self.find_element_with_wait(source_locator)
@@ -83,32 +81,63 @@ class BasePage:
             simulateHTML5DragAndDrop(arguments[0], arguments[1]);
         """, source, target)
 
-    def wait_for_url_to_be(self, url, timeout=10):
-        WebDriverWait(self.driver, timeout).until(EC.url_to_be(url))
-
-    def wait_for_element_to_disappear(self, locator, timeout=10):
-        WebDriverWait(self.driver, timeout).until(EC.invisibility_of_element_located(locator))
-
+    # ---------------- STATE CHECKS ----------------
     def is_element_displayed(self, locator):
         try:
-            element = self.driver.find_element(*locator)
-            return element.is_displayed()
-        except (TimeoutException, ElementClickInterceptedException):
+            return self.driver.find_element(*locator).is_displayed()
+        except Exception:
             return False
 
-    def wait_for_element_present(self, locator, timeout=10):
-        WebDriverWait(self.driver, timeout).until(EC.presence_of_element_located(locator))
-
-    def wait_for_text_in_element(self, locator, text, timeout=10):
-        WebDriverWait(self.driver, timeout).until(EC.text_to_be_present_in_element(locator, text))
-
-    def wait_for_url_contains(self, partial_url, timeout=10):
-        WebDriverWait(self.driver, timeout).until(EC.url_contains(partial_url))
-
-    def refresh_page(self):
-        self.driver.refresh()
-
-    def wait_for_element_visible(self, locator, timeout=10):
+    # ---------------- WAITS ----------------
+    def wait_for_element_to_be_visible(self, locator, timeout=10):
         WebDriverWait(self.driver, timeout).until(
             EC.visibility_of_element_located(locator)
         )
+
+    def wait_for_element_to_be_clickable(self, locator, timeout=10):
+        WebDriverWait(self.driver, timeout).until(
+            EC.element_to_be_clickable(locator)
+        )
+
+    def wait_for_url_to_be(self, url, timeout=10):
+        WebDriverWait(self.driver, timeout).until(
+            EC.url_to_be(url)
+        )
+
+    def wait_for_url_contains(self, partial_url, timeout=10):
+        WebDriverWait(self.driver, timeout).until(
+            EC.url_contains(partial_url)
+        )
+
+    def wait_for_element_to_disappear(self, locator, timeout=10):
+        WebDriverWait(self.driver, timeout).until(
+            EC.invisibility_of_element_located(locator)
+        )
+
+    def wait_counter_increases(self, locator, old_value, timeout=10):
+        WebDriverWait(self.driver, timeout).until(
+            lambda d: (
+                (el := d.find_elements(*locator))
+                and el[0].text.strip().isdigit()
+                and int(el[0].text) > old_value
+            )
+        )
+
+    # ---------------- UTILS ----------------
+    def refresh(self):
+        self.driver.refresh()
+
+    def scroll_to(self, locator):
+        element = self.driver.find_element(*locator)
+        self.driver.execute_script("arguments[0].scrollIntoView();", element)
+
+    def find_element_with_wait(self, locator):
+        self.wait.until(EC.visibility_of_element_located(locator))
+        return self.driver.find_element(*locator)
+
+    def find_elements_with_wait(self, locator):
+        self.wait.until(EC.visibility_of_element_located(locator))
+        return self.driver.find_elements(*locator)
+
+    def get_current_url(self):
+        return self.driver.current_url

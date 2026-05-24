@@ -1,5 +1,7 @@
-EMAIL_INPUT = "//input[@name='name']"
-PASSWORD_INPUT = "//input[@name='Пароль']"
-BUTTON_LOGIN = "//button[text()='Войти']"
-BUTTON_REGISTER = "//a[text()='Зарегистрироваться']"
-BUTTON_FORGOT_PASSWORD = "//a[text()='Восстановить пароль']"
+from selenium.webdriver.common.by import By
+
+
+EMAIL_INPUT = (By.XPATH, "//input[@name='name']")
+PASSWORD_INPUT = (By.XPATH, "//input[@name='Пароль']")
+BUTTON_LOGIN = (By.XPATH, "//button[text()='Войти']")
+BUTTON_FORGOT_PASSWORD = (By.XPATH, "//a[text()='Восстановить пароль']")

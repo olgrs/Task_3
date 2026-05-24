@@ -1,42 +1,69 @@
 import allure
-from selenium.webdriver.support import expected_conditions as EC
 
-from pages.base_page import BasePage
+from data import FEED_URL
 from locators.feed_page_locators import *
+from pages.base_page import BasePage
 
 
 class FeedPage(BasePage):
+    @allure.step("Открыть страницу списка заказов")
+    def open(self):
+        self.go_to_url(FEED_URL)
 
     @allure.step("Клик по первому заказу в ленте")
-    def click_first_order(self):
-        self.click_to_element(("xpath", ORDER_IN_FEED))
+    def open_first_order(self):
+        self.click_to_element(ORDER_IN_FEED_LAST)
 
-    def wait_for_first_order(self, timeout=15):
-        self.wait_for_element_present(("xpath", ORDER_IN_FEED), timeout)
+    @allure.step("Отобажение модального окна заказа")
+    def is_order_modal_open(self):
+        return self.is_element_displayed(MODAL_ORDER_DETAILS)
 
-    def wait_for_order_number(self, order_number, timeout=60):
-        locator = ("xpath", f"//*[contains(text(), '{order_number}')]")
-        self.wait_for_element_visible(locator, timeout)
+    @allure.step("Получение счетчика заказов")
+    def get_all_time_counter(self, locator):
+        self.wait_for_element_to_be_visible(locator)
+        return int(self.get_text_from_element(locator))
 
-    def wait_for_counters(self, timeout=10):
-        self.wait.until(EC.presence_of_all_elements_located(("xpath", ORDER_FEED_NUMBER)))
-        elements = self.find_elements(("xpath", ORDER_FEED_NUMBER))
-        if len(elements) < 2:
-            raise TimeoutException("Счётчики не найдены")
+    @allure.step("Получение локатора заказа")
+    def get_order_locator(self, locator_template, order_number):
+        locator = (
+            locator_template[0],
+            locator_template[1].format(order_number)
+        )
+        return locator
 
-    def get_counter_all_time(self):
-        return self.find_elements(("xpath", ORDER_FEED_NUMBER))[0].text
+    @allure.step("Ожидание появления заказа")
+    def wait_order(self, locator_template, order_number, timeout=30):
 
-    def get_counter_today(self):
-        return self.find_elements(("xpath", ORDER_FEED_NUMBER))[1].text
+        self.wait_for_element_to_be_visible(
+            self.get_order_locator(locator_template, order_number),
+            timeout
+        )
 
-    @allure.step("Получить ID заказа из модального окна")
-    def get_order_id_from_modal(self):
-        return self.get_text_from_element(("xpath", TEXT_ORDER_ID))
+    @allure.step("Ожидание заказа в ленте")
+    def wait_order_in_feed(self, order_number, timeout=30):
+        self.wait_order(ORDER_IN_FEED, order_number, timeout)
 
-    @allure.step("Получить номер заказа в разделе 'В работе'")
-    def get_order_in_work(self):
-        return self.get_text_from_element(("xpath", ORDER_IN_WORK))
+    @allure.step("Ожидание заказа в работе")
+    def wait_order_in_work(self, order_number, timeout=60):
+        expected = f"0{order_number}"
+        self.wait_order(ORDER_IN_WORK, expected, timeout)
 
-    def is_order_displayed(self, order_number):
-        return self.is_element_displayed(("xpath", ORDER_NUMBER.format(order_number)))
+    @allure.step("Проверка заказа в ленте")
+    def is_order_in_feed(self, order_number):
+        return self.is_order_displayed(ORDER_IN_FEED, order_number)
+
+    @allure.step("Проверка заказа в работе")
+    def is_order_in_work(self, order_number):
+        expected = f"0{order_number}"
+        return self.is_order_displayed(ORDER_IN_WORK, expected)
+
+    @allure.step("Проверка отображения заказа")
+    def is_order_displayed(self, locator_template, order_number):
+        result = self.is_element_displayed(
+            self.get_order_locator(locator_template, order_number)
+        )
+        return result
+
+    @allure.step("Проверка отображения ленты заказов")
+    def is_feed_displayed(self):
+        return self.is_element_displayed(ORDER_FEED_HEADING)
